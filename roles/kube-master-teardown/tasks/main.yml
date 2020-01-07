@@ -1,0 +1,24 @@
+---
+- name: Reset master
+  shell: >
+    kubeadm reset --force
+  register: cluster_reset
+
+- name: Remove all semaphores
+  when: cluster_reset is succeeded
+  file:
+    path: "/etc/.kubeadm-complete"
+    state: absent
+
+- name: Remove all admin.conf
+  when: cluster_reset is succeeded
+  file:
+    path: "{{ kubectl_home }}/admin.conf"
+    state: absent
+
+- name: Remove all admin.conf
+  when: cluster_reset is succeeded
+  file:
+    path: "{{ kubectl_home }}/.kube/admin.conf"
+    state: absent
+

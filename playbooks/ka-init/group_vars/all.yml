@@ -10,6 +10,12 @@ all_inventory: "all.local.generated"
 # - docker
 # - crio
 container_runtime: docker
+docker_user: root
+
+docker_non_root_user: false
+kubectl_user: root
+kubectl_group: root
+kubectl_home: /root
 
 # --------------------------- -
 # docker vars               - -
@@ -34,7 +40,8 @@ crio_baseurl: https://cbs.centos.org/repos/paas7-crio-115-candidate/x86_64/os
 # - multus
 # - bridge
 pod_network_type: "flannel"
-pod_network_cidr: "10.244.0.0"
+pod_network_cidr: "192.168.0.0"
+apiserver_advertise_address: "192.168.56.30"
 
 # General config
 
@@ -97,10 +104,10 @@ skip_virthost_depedencies: false
 # Enables a bridge to the outside LAN
 # (as opposed to using virbr0)
 bridge_networking: false
-bridge_name: virbr0
-bridge_physical_nic: "enp1s0f1"
-bridge_network_name: "br0"
-bridge_network_cidr: 192.168.1.0/24
+bridge_name: enp0s17
+#bridge_physical_nic: "enp1s0f1"
+bridge_network_name: "enp0s17"
+bridge_network_cidr: 192.168.0.0/24
 
 # ----------------------------
 # device plugins

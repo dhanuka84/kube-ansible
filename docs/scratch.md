@@ -66,7 +66,7 @@ My guess is because I'm being stubborn and trying to use Flannel plainly. I thin
    42  ls
    43  updatedb
    44  locate nginx_pod
-   45  cd /home/centos/
+   45  cd /home/dhanuka/
    46  ls
    47  cat nginx_pod.yaml 
    48  kubectl expose rc nginx --port=8999 --target-port=8000

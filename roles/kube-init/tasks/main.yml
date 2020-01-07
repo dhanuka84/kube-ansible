@@ -4,45 +4,6 @@
 #  [root@kube-master centos]# kubeadm --help | grep reset
 #    reset       Run this to revert any changes made to this host by 'kubeadm init' or 'kubeadm join'.
 
-- name: create kubeadm config file
-  block:
-    - name: Install jq binary
-      get_url:
-        url: https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64
-        dest: /usr/bin/jq
-
-    - name: set jq binary permission
-      file:
-        path: /usr/bin/jq
-        mode: 0755
-
-    - name: check kubeadm version (major)
-      shell: >
-        kubeadm version -o json | jq -r .clientVersion.major
-      register: kubeadm_version_major
-
-    - name: check kubeadm version (minor)
-      shell: >
-        kubeadm version -o json | jq -r .clientVersion.minor | sed -e 's/\+//g'
-      register: kubeadm_version_minor
-
-    - name: create kubeadm config file (<= 1.12)
-      template:
-        src: kubeadm.cfg.v1alpha.j2
-        dest: /root/kubeadm.cfg
-      when: kubeadm_version_minor.stdout|int <= 12
-
-    - name: create kubeadm config file (>= 1.13)
-      template:
-        src: kubeadm.cfg.v1beta.j2
-        dest: /root/kubeadm.cfg
-      when: kubeadm_version_minor.stdout|int >= 13
-
-    - name: create kubeadm config file (>= 1.16)
-      template:
-        src: kubeadm.cfg.v1beta2.j2
-        dest: /root/kubeadm.cfg
-      when: kubeadm_version_minor.stdout|int >= 16
 
 - name: Default cri-o flags to empty
   set_fact:
@@ -57,28 +18,21 @@
   set_fact:
     k8s_version: ""
 
-# Was trying to use flannel and running with:
-#     kubeadm init > /etc/kubeadm.init.txt
-# abandonded for now...
 - name: Run kubeadm init
-  shell: >
-    kubeadm init {{ k8s_version }} {{ arg_crio }} --config=/root/kubeadm.cfg > /var/log/kubeadm.init.log
+  #when: reset_cluster is succeeded
+  shell: > 
+    sudo  kubeadm init --apiserver-advertise-address={{ apiserver_advertise_address }} --pod-network-cidr={{ pod_network_cidr }}/16
+  become: true
+  become_user: "{{ docker_user }}"
+  register: init_cluster
   args:
     creates: /etc/.kubeadm-complete
 
 - name: Mark init complete
+  when: init_cluster is succeeded
   file:
     path: /etc/.kubeadm-complete
     state: directory
-
-- name: Get join command
-  shell: >
-    kubeadm token create --print-join-command
-  register: kubeadm_join_output
-
-- name: Set fact with join command
-  set_fact:
-    kubeadm_join_command: "{{ kubeadm_join_output.stdout }}"
 
 # -------- Copy in admin.conf
 
@@ -89,6 +43,7 @@
   # export KUBECONFIG=$HOME/admin.conf
 
 - name: Ensure .kube folder exists
+  when: init_cluster is succeeded
   file:
     path: "{{ kubectl_home }}/.kube/"
     state: directory
@@ -97,16 +52,36 @@
     mode: 0755
 
 - name: Copy admin.conf to kubectl user's home
+  when: init_cluster is succeeded
   shell: >
     cp -f /etc/kubernetes/admin.conf {{ kubectl_home }}/.kube/admin.conf
   args:
     creates: "{{ kubectl_home }}/admin.conf"
 
 - name: Set admin.conf ownership
+  when: init_cluster is succeeded
   file:
     path: "{{ kubectl_home }}/.kube/admin.conf"
     owner: "{{ kubectl_user }}"
     group: "{{ kubectl_group }}"
+
+- name: Create flannel network
+  shell: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
+  become: true
+  become_user: "{{ docker_user }}"
+
+
+
+- name: Get join command
+  shell: >
+    kubeadm token create --print-join-command
+  register: kubeadm_join_output
+
+- name: Set fact with join command
+  set_fact:
+    kubeadm_join_command: "{{ kubeadm_join_output.stdout }}"
+
+
 
 - name: Add KUBECONFIG env for admin.conf to .bashrc
   lineinfile:

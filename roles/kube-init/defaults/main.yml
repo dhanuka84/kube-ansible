@@ -1,4 +1,6 @@
-kubectl_user: centos
-kubectl_group: centos
-kubectl_home: /home/centos
+kubectl_user: root
+kubectl_group: root
+kubectl_home: /root
 control_plane_listen_all: false
+pod_network_cidr: 192.168.0.0
+#apiserver_advertise_address: 192.168.56.30

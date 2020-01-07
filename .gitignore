@@ -14,3 +14,4 @@ roles/auto-kube-dev
 roles/redhat-nfvpe.vm-spinup
 roles/redhat-nfvpe.prometheus-operator
 roles/oVirt.*
+k8s_env/

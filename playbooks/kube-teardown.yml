@@ -1,9 +1,17 @@
 ---
 - import_playbook: ka-init/init.yml
 
-- hosts: nodes,master
+- hosts: master
   become: true
   become_user: root
   tasks: []
   roles:
-    - { role: kube-teardown }
+    - { role: kube-master-teardown }
+
+
+- hosts: nodes
+  become: true
+  become_user: root
+  tasks: []
+  roles:
+    - { role: kube-nodes-teardown }

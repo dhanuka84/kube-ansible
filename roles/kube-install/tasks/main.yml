@@ -1,13 +1,9 @@
 ---
 # Setup variables
-- include: variables.yml
+#- include: variables.yml
 
 - import_tasks: system_setup.yml
 
-- name: Template kube RPM repo
-  template:
-    src: kubernetes.repo.j2
-    dest: /etc/yum.repos.d/kubernetes.repo
 
 - name: Default kube version fact
   set_fact:

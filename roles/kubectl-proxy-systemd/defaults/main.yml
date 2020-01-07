@@ -1,4 +1,4 @@
 ---
-kubectl_home: /home/centos
-kubectl_user: centos
-kubectl_group: centos
+kubectl_home: /home/dhanuka
+kubectl_user: dhanuka
+kubectl_group: dhanuka

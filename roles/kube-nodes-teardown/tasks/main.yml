@@ -1,0 +1,13 @@
+---
+- name: Reset nodes
+  shell: >
+    kubeadm reset --force
+  register: cluster_reset
+
+- name: Remove all semaphores
+  when: cluster_reset is succeeded
+  file:
+    path: "/etc/.kubeadm-joined"
+    state: absent
+
+
