@@ -62,7 +62,7 @@ kube_baseurl: http://yum.kubernetes.io/repos/kubernetes-el7-x86_64
 # You'd use "1.7.5-0" here, such as:
 # kube_version: 1.7.5-0
 # The default is... "latest"
-kube_version: "latest"
+kube_version: "1.16.4-0"
 
 # Binary install
 # Essentially replaces the RPM installed binaries with a specific set of binaries from URLs.

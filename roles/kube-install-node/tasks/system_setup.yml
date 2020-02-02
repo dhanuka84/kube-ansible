@@ -1,0 +1,11 @@
+---
+- name: "Disable SELinux :("
+  selinux:
+    state: disabled
+
+- name: "reboot machine"
+  reboot:
+      reboot_timeout: 600
+  when: not skip_reboot
+
+

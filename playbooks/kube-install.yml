@@ -15,7 +15,6 @@
     - { role: kube-install }
 
 
-
 - hosts: master
   become: true
   become_user: root

@@ -1,0 +1,10 @@
+---
+
+
+- hosts: master,nodes
+  become: true
+  become_user: root
+  tasks: []
+  roles:
+    - { role: kube-remove }
+

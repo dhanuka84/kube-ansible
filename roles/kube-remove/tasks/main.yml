@@ -1,0 +1,12 @@
+---
+
+- name: Remove k8s packages
+  package:
+    name: "{{ item }}"
+    state: absent
+  with_items:
+    - kubeadm
+    - kubelet
+    - kubectl
+    - kubernetes-cni
+  when:  k8s_use_rpms|default("") == ""
